@@ -36,7 +36,7 @@ function App() {
     setReportData(null);
 
     try {
-      const response = await fetch(`http://localhost:5001/api/v1/data/${formData.dataId}/energy-analytics-reports`, {
+      const response = await fetch(`https://wattlens.preciousifeaka.site/api/v1/data/${formData.dataId}/energy-analytics-reports`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
