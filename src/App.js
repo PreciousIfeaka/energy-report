@@ -167,7 +167,10 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
     <div>
       <h2 className="section-title">Executive Summary (Monthly Overview)</h2>
       <div style={{fontSize: '0.9rem', color: '#666', marginBottom: '20px'}}>
-        Total Readings: {data_quality_indicators.total_values} | Interval: {data_quality_indicators.measurment_interval_minutes} mins
+        Total Values: {data_quality_indicators.total_values} readings |
+        Missing Values: {data_quality_indicators.total_missing} readings |
+        Percentage Missing: {data_quality_indicators.percentage_missing} | 
+        Interval: {data_quality_indicators.measurment_interval_minutes} mins
       </div>
 
       <div className="card-grid">
@@ -331,7 +334,11 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
     <div>
       <h2 className="section-title">Executive Summary (Weekly Overview)</h2>
       <div style={{fontSize: '0.9rem', color: '#666', marginBottom: '20px'}}>
-        Total Weeks: {performance_reviews.length} | Readings: {data_quality_indicators.total_values}
+        Total Weeks: {performance_reviews.length} weeks |
+        Total Values: {data_quality_indicators.total_values} readings |
+        Missing Values: {data_quality_indicators.total_missing} readings |
+        Percentage Missing: {data_quality_indicators.percentage_missing} | 
+        Interval: {data_quality_indicators.measurment_interval_minutes} mins
       </div>
 
       <div className="card-grid">
