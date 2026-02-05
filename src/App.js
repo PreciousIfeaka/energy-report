@@ -532,8 +532,9 @@ function DayReportView({ data, formatNumber, formatCurrency }) {
     <div>
       <h2 className="section-title">Executive Summary (Global)</h2>
       <div style={{fontSize: '0.9rem', color: '#666', marginBottom: '20px'}}>
-        Data Quality: {data_quality_indicators.total_values} readings | 
-        Missing: {data_quality_indicators.percentage_missing} | 
+        Total Values: {data_quality_indicators.total_values} readings |
+        Missing Values: {data_quality_indicators.total_missing} readings |
+        Percentage Missing: {data_quality_indicators.percentage_missing} | 
         Interval: {data_quality_indicators.measurment_interval_minutes} mins
       </div>
 
