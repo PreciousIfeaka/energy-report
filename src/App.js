@@ -174,7 +174,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
       </div>
 
       <div className="card-grid">
-        <StatCard label="Total Energy (KWh)" value={formatNumber(energy_load_summary.total_energy_consumed)} />
+        <StatCard label="Total Energy (KWh)" value={formatDecimal(energy_load_summary.total_energy_consumed)} />
         <StatCard label="Peak Load" value={`${formatNumber(energy_load_summary.peak_load)} kVA`} />
         <StatCard label="Total Cost" value={formatCurrency(energy_load_summary.total_energy_cost)} />
         <StatCard label="Load Factor" value={energy_load_summary.load_factor} />
@@ -546,7 +546,7 @@ function DayReportView({ data, formatNumber, formatCurrency }) {
       </div>
 
       <div className="card-grid">
-        <StatCard label="Total Energy Consumed" value={`${formatNumber(energy_load_summary.total_energy_consumed / 1000)} KWh`} />
+        <StatCard label="Total Energy Consumed" value={`${formatDecimal(energy_load_summary.total_energy_consumed)} KWh`} />
         <StatCard label="Peak Load" value={`${formatNumber(energy_load_summary.peak_load)} kVA`} />
         <StatCard label="Total Energy Cost" value={formatCurrency(energy_load_summary.total_energy_cost)} />
         <StatCard label="Load Factor" value={energy_load_summary.load_factor} />
