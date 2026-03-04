@@ -456,8 +456,8 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
             <StatCard label="Peak kVA" value={formatNumber(week.summary_cards.peak_kva)} />
             <StatCard label="Cost" value={formatCurrency(week.summary_cards.energy_cost)} />
             <StatCard label="Daily Avg" value={formatDecimal(week.summary_cards.daily_avg_energy)} />
-            <StatCard label="Weekday Avg" value={formatDecimal(week.summary_cards.weekday_avg_energy)} />
-            <StatCard label="Weekend Avg" value={formatDecimal(week.summary_cards.weekend_avg_energy)} />
+            {/* <StatCard label="Weekday Avg" value={formatDecimal(week.summary_cards.weekday_avg_energy)} />
+            <StatCard label="Weekend Avg" value={formatDecimal(week.summary_cards.weekend_avg_energy)} /> */}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px', marginBottom: '30px' }}>
