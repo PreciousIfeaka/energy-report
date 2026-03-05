@@ -35,7 +35,7 @@ function App() {
     setReportData(null);
 
     try {
-      const response = await fetch(`https://fiber.preciousifeaka.site/api/v1/data/${formData.dataId}/energy-analytics-reports`, {
+      const response = await fetch(`http://localhost:5001/api/v1/data/${formData.dataId}/energy-analytics-reports`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -64,9 +64,9 @@ function App() {
   };
 
   // --- Helper Formatters ---
-  const formatNumber = (num) => new Intl.NumberFormat('en-US').format(Math.round(num));
-  const formatDecimal = (num) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
-  const formatCurrency = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'NGN' }).format(num);
+  // All numeric values are shown to 2 decimal places
+  const formatDecimal = (num) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num ?? 0);
+  const formatCurrency = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'NGN' }).format(num ?? 0);
 
   // Period label mapping for display
   const periodLabels = {
@@ -122,7 +122,6 @@ function App() {
           {reportData.overall_summary && (
             <OverallSummaryView
               summary={reportData.overall_summary}
-              formatNumber={formatNumber}
               formatDecimal={formatDecimal}
               formatCurrency={formatCurrency}
             />
@@ -142,27 +141,24 @@ function App() {
               {section.period === 'day' && (
                 <DayReportView
                   data={section}
-                  formatNumber={formatNumber}
-                  formatCurrency={formatCurrency}
                   formatDecimal={formatDecimal}
+                  formatCurrency={formatCurrency}
                 />
               )}
 
               {section.period === 'week' && (
                 <WeekReportView
                   data={section}
-                  formatNumber={formatNumber}
-                  formatCurrency={formatCurrency}
                   formatDecimal={formatDecimal}
+                  formatCurrency={formatCurrency}
                 />
               )}
 
               {section.period === 'month' && (
                 <MonthReportView
                   data={section}
-                  formatNumber={formatNumber}
-                  formatCurrency={formatCurrency}
                   formatDecimal={formatDecimal}
+                  formatCurrency={formatCurrency}
                 />
               )}
             </div>
@@ -176,14 +172,14 @@ function App() {
 // ==========================================
 // Overall Summary Component
 // ==========================================
-function OverallSummaryView({ summary, formatNumber, formatDecimal, formatCurrency }) {
+function OverallSummaryView({ summary, formatDecimal, formatCurrency }) {
   return (
     <div className="overall-summary">
       <h2 className="section-title">Overall Summary (All Sections Combined)</h2>
       <div className="card-grid">
         <StatCard label="Total Energy Consumed" value={`${formatDecimal(summary.total_energy_consumed)} kWh`} />
         <StatCard label="Total Energy Cost" value={formatCurrency(summary.total_energy_cost)} />
-        <StatCard label="Peak Load" value={`${formatNumber(summary.peak_load)} kVA`} />
+        <StatCard label="Peak Load" value={`${formatDecimal(summary.peak_load)} kVA`} />
       </div>
     </div>
   );
@@ -219,15 +215,15 @@ function FacilityHeader({ info, period }) {
 // ==========================================
 // 1. MONTH REPORT VIEW
 // ==========================================
-function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
+function MonthReportView({ data, formatDecimal, formatCurrency }) {
   const { data_quality_indicators, energy_load_summary, performance_reviews } = data;
 
   const getOpDetailsString = (opData) => {
-    return `Avg: ${formatNumber(opData.avg_kva)} | Min: ${formatNumber(opData.min_kva)} | Max: ${formatNumber(opData.max_kva)} kVA`;
-  }
+    return `Avg: ${formatDecimal(opData.avg_kva)} | Min: ${formatDecimal(opData.min_kva)} | Max: ${formatDecimal(opData.max_kva)} kVA`;
+  };
   const getProfileDetailsString = (stats) => {
-    return `Avg: ${formatNumber(stats.average)} | Min: ${formatNumber(stats.min)} | Max: ${formatNumber(stats.max)} kVA`;
-  }
+    return `Avg: ${formatDecimal(stats.average)} | Min: ${formatDecimal(stats.min)} | Max: ${formatDecimal(stats.max)} kVA`;
+  };
 
   return (
     <div>
@@ -240,8 +236,8 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
       </div>
 
       <div className="card-grid">
-        <StatCard label="Total Energy (KWh)" value={formatDecimal(energy_load_summary.total_energy_consumed)} />
-        <StatCard label="Peak Load" value={`${formatNumber(energy_load_summary.peak_load)} kVA`} />
+        <StatCard label="Total Energy (kWh)" value={formatDecimal(energy_load_summary.total_energy_consumed)} />
+        <StatCard label="Peak Load" value={`${formatDecimal(energy_load_summary.peak_load)} kVA`} />
         <StatCard label="Total Cost" value={formatCurrency(energy_load_summary.total_energy_cost)} />
         <StatCard label="Load Factor" value={energy_load_summary.load_factor} />
       </div>
@@ -254,8 +250,8 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month_label" />
               <YAxis />
-              <Tooltip formatter={(value) => formatNumber(value) + " KWh"} />
-              <Bar dataKey="total_consumption_kwh" fill="#9c27b0" name="Energy (KWh)" />
+              <Tooltip formatter={(value) => formatDecimal(value) + " kWh"} />
+              <Bar dataKey="total_consumption_kwh" fill="#9c27b0" name="Energy (kWh)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -274,12 +270,12 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
           </div>
 
           <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
-            <StatCard label="Total KWh" value={formatNumber(month.summary_cards.total_energy_consumption)} />
-            <StatCard label="Peak kVA" value={formatNumber(month.summary_cards.peak_kva)} />
+            <StatCard label="Total kWh" value={formatDecimal(month.summary_cards.total_energy_consumption)} />
+            <StatCard label="Peak kVA" value={formatDecimal(month.summary_cards.peak_kva)} />
             <StatCard label="Cost" value={formatCurrency(month.summary_cards.energy_cost)} />
-            <StatCard label="Daily Avg KWh" value={formatDecimal(month.summary_cards.daily_avg_energy)} />
-            <StatCard label="Weekday Avg KWh" value={formatDecimal(month.summary_cards.weekday_avg_energy)} />
-            <StatCard label="Weekend Avg Kwh" value={formatDecimal(month.summary_cards.weekend_avg_energy)} />
+            <StatCard label="Daily Avg kWh" value={formatDecimal(month.summary_cards.daily_avg_energy)} />
+            {/* <StatCard label="Weekday Avg kWh" value={formatDecimal(month.summary_cards.weekday_avg_energy)} />
+            <StatCard label="Weekend Avg kWh" value={formatDecimal(month.summary_cards.weekend_avg_energy)} /> */}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px', marginBottom: '30px' }}>
@@ -290,7 +286,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
-                  <Tooltip labelFormatter={(label, payload) => payload[0]?.payload.full_date} formatter={(value) => formatNumber(value) + " kWh"} />
+                  <Tooltip labelFormatter={(label, payload) => payload[0]?.payload.full_date} formatter={(value) => formatDecimal(value) + " kWh"} />
                   <Bar dataKey="consumption_kwh" fill="#7b1fa2" />
                 </BarChart>
               </ResponsiveContainer>
@@ -298,7 +294,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
 
             {month.week_comparison_list && month.week_comparison_list.length > 0 && (
               <div className="chart-container" style={{ height: '300px', marginBottom: 0, overflowY: 'auto' }}>
-                <h4 className="chart-title">Week-on-Week (KWh)</h4>
+                <h4 className="chart-title">Week-on-Week (kWh)</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {month.week_comparison_list.map((item, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', fontSize: '0.8rem' }}>
@@ -310,7 +306,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
                           height: '100%', borderRadius: '5px'
                         }}></div>
                       </div>
-                      <div style={{ width: '70px', textAlign: 'right' }}>{formatNumber(item.value_kwh)}</div>
+                      <div style={{ width: '80px', textAlign: 'right' }}>{formatDecimal(item.value_kwh)}</div>
                     </div>
                   ))}
                 </div>
@@ -326,7 +322,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="hour" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip formatter={(value) => formatDecimal(value)} />
                   <Legend />
                   <Area type="monotone" dataKey="max_range" stroke="none" fill="#f3e5f5" name="Max Range" />
                   <Area type="monotone" dataKey="min_range" stroke="none" fill="#fff" name="Min Range" />
@@ -339,7 +335,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
                 </ComposedChart>
               </ResponsiveContainer>
               <div style={{ textAlign: 'center', fontSize: '0.9rem' }}>
-                Peak Event: <strong style={{ color: 'red' }}>{formatNumber(month.hourly_load_profile.peak_event.value)} kVA</strong> at {month.hourly_load_profile.peak_event.formatted_hour}
+                Peak Event: <strong style={{ color: 'red' }}>{formatDecimal(month.hourly_load_profile.peak_event.value)} kVA</strong> at {month.hourly_load_profile.peak_event.formatted_hour}
               </div>
             </div>
           )}
@@ -366,7 +362,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
               <h4>{month.operating_hours.daytime.label}</h4>
               <div className="op-percent">{month.operating_hours.daytime.percentage}</div>
               <div className="op-details">
-                Consumption: {formatNumber(month.operating_hours.daytime.energy_consumption)} KWh<br />
+                Consumption: {formatDecimal(month.operating_hours.daytime.energy_consumption)} kWh<br />
                 {getOpDetailsString(month.operating_hours.daytime)}
               </div>
             </div>
@@ -374,7 +370,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
               <h4>{month.operating_hours.nighttime.label}</h4>
               <div className="op-percent">{month.operating_hours.nighttime.percentage}</div>
               <div className="op-details">
-                Consumption: {formatNumber(month.operating_hours.nighttime.energy_consumption)} KWh<br />
+                Consumption: {formatDecimal(month.operating_hours.nighttime.energy_consumption)} kWh<br />
                 {getOpDetailsString(month.operating_hours.nighttime)}
               </div>
             </div>
@@ -389,7 +385,7 @@ function MonthReportView({ data, formatNumber, formatCurrency, formatDecimal }) 
 // ==========================================
 // 2. WEEK REPORT VIEW
 // ==========================================
-function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
+function WeekReportView({ data, formatDecimal, formatCurrency }) {
   const { data_quality_indicators, energy_load_summary, performance_reviews } = data;
 
   const weeklyTrendData = energy_load_summary.consumption_summary?.weekly_consumption
@@ -400,11 +396,11 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
     : [];
 
   const getOpDetailsString = (opData) => {
-    return `Avg: ${formatNumber(opData.avg_kva)} | Min: ${formatNumber(opData.min_kva)} | Max: ${formatNumber(opData.max_kva)} kVA`;
-  }
+    return `Avg: ${formatDecimal(opData.avg_kva)} | Min: ${formatDecimal(opData.min_kva)} | Max: ${formatDecimal(opData.max_kva)} kVA`;
+  };
   const getProfileDetailsString = (stats) => {
-    return `Avg: ${formatNumber(stats.average)} | Min: ${formatNumber(stats.min)} | Max: ${formatNumber(stats.max)} kVA`;
-  }
+    return `Avg: ${formatDecimal(stats.average)} | Min: ${formatDecimal(stats.min)} | Max: ${formatDecimal(stats.max)} kVA`;
+  };
 
   return (
     <div>
@@ -419,7 +415,7 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
 
       <div className="card-grid">
         <StatCard label="Total Energy (kWh)" value={formatDecimal(energy_load_summary.total_energy_consumed)} />
-        <StatCard label="Peak Load" value={`${formatNumber(energy_load_summary.peak_load)} kVA`} />
+        <StatCard label="Peak Load" value={`${formatDecimal(energy_load_summary.peak_load)} kVA`} />
         <StatCard label="Total Cost" value={formatCurrency(energy_load_summary.total_energy_cost)} />
         <StatCard label="Load Factor" value={energy_load_summary.load_factor} />
       </div>
@@ -453,11 +449,11 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
 
           <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
             <StatCard label="Total kWh" value={formatDecimal(week.summary_cards.total_energy_consumption)} />
-            <StatCard label="Peak kVA" value={formatNumber(week.summary_cards.peak_kva)} />
+            <StatCard label="Peak kVA" value={formatDecimal(week.summary_cards.peak_kva)} />
             <StatCard label="Cost" value={formatCurrency(week.summary_cards.energy_cost)} />
-            <StatCard label="Daily Avg" value={formatDecimal(week.summary_cards.daily_avg_energy)} />
-            {/* <StatCard label="Weekday Avg" value={formatDecimal(week.summary_cards.weekday_avg_energy)} />
-            <StatCard label="Weekend Avg" value={formatDecimal(week.summary_cards.weekend_avg_energy)} /> */}
+            <StatCard label="Daily Avg kWh" value={formatDecimal(week.summary_cards.daily_avg_energy)} />
+            {/* <StatCard label="Weekday Avg kWh" value={formatDecimal(week.summary_cards.weekday_avg_energy)} />
+            <StatCard label="Weekend Avg kWh" value={formatDecimal(week.summary_cards.weekend_avg_energy)} /> */}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px', marginBottom: '30px' }}>
@@ -468,7 +464,7 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="day" />
                   <YAxis />
-                  <Tooltip formatter={(value) => formatNumber(value) + " kWh"} />
+                  <Tooltip labelFormatter={(label, payload) => payload[0]?.payload.full_date} formatter={(value) => formatDecimal(value) + " kWh"} />
                   <Bar dataKey="consumption_kwh" fill="#4caf50" />
                 </BarChart>
               </ResponsiveContainer>
@@ -488,7 +484,7 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
                           height: '100%', borderRadius: '5px'
                         }}></div>
                       </div>
-                      <div style={{ width: '60px', textAlign: 'right' }}>{formatNumber(item.value_kwh)}</div>
+                      <div style={{ width: '80px', textAlign: 'right' }}>{formatDecimal(item.value_kwh)}</div>
                     </div>
                   ))}
                 </div>
@@ -503,7 +499,7 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="hour" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => formatDecimal(value)} />
                 <Legend />
                 <Area type="monotone" dataKey="max_range" stroke="none" fill="#c8e6c9" name="Max Range" />
                 <Area type="monotone" dataKey="min_range" stroke="none" fill="#fff" name="Min Range" />
@@ -516,14 +512,14 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
               </ComposedChart>
             </ResponsiveContainer>
             <div style={{ textAlign: 'center', fontSize: '0.9rem' }}>
-              Peak Event: <strong style={{ color: 'red' }}>{formatNumber(week.hourly_load_profile.peak_event.value)} kVA</strong> at {week.hourly_load_profile.peak_event.formatted_hour}
+              Peak Event: <strong style={{ color: 'red' }}>{formatDecimal(week.hourly_load_profile.peak_event.value)} kVA</strong> at {week.hourly_load_profile.peak_event.formatted_hour}
             </div>
           </div>
 
           {week.consumption_pattern_table && (
             <div className="chart-container" style={{ height: 'auto' }}>
               <h4 className="chart-title">Daily Consumption Heatmap</h4>
-              <ConsumptionHeatmap data={week.consumption_pattern_table} />
+              <ConsumptionHeatmap data={week.consumption_pattern_table} formatDecimal={formatDecimal} />
             </div>
           )}
 
@@ -569,7 +565,7 @@ function WeekReportView({ data, formatNumber, formatCurrency, formatDecimal }) {
   );
 }
 
-function ConsumptionHeatmap({ data }) {
+function ConsumptionHeatmap({ data, formatDecimal }) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const hours = Array.from({ length: 24 }, (_, i) => i);
   let maxVal = 0;
@@ -597,7 +593,7 @@ function ConsumptionHeatmap({ data }) {
                     textAlign: 'center',
                     padding: '4px',
                     border: '1px solid #eee'
-                  }} title={`${val.toLocaleString()} kWh`}></td>
+                  }} title={`${formatDecimal(val)} kWh`}></td>
                 )
               })}
             </tr>
@@ -611,13 +607,13 @@ function ConsumptionHeatmap({ data }) {
 // ==========================================
 // 3. DAY REPORT VIEW
 // ==========================================
-function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
+function DayReportView({ data, formatDecimal, formatCurrency }) {
   const { data_quality_indicators, energy_load_summary, performance_reviews } = data;
   const typicalProfile = energy_load_summary.typical_day_profile;
 
   const getOpDetailsString = (opData) => {
-    return `Avg: ${formatNumber(opData.avg_kva)} | Min: ${formatNumber(opData.min_kva)} | Max: ${formatNumber(opData.max_kva)} kVA`;
-  }
+    return `Avg: ${formatDecimal(opData.avg_kva)} | Min: ${formatDecimal(opData.min_kva)} | Max: ${formatDecimal(opData.max_kva)} kVA`;
+  };
 
   return (
     <div>
@@ -630,8 +626,8 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
       </div>
 
       <div className="card-grid">
-        <StatCard label="Total Energy Consumed" value={`${formatDecimal(energy_load_summary.total_energy_consumed)} KWh`} />
-        <StatCard label="Peak Load" value={`${formatNumber(energy_load_summary.peak_load)} kVA`} />
+        <StatCard label="Total Energy Consumed" value={`${formatDecimal(energy_load_summary.total_energy_consumed)} kWh`} />
+        <StatCard label="Peak Load" value={`${formatDecimal(energy_load_summary.peak_load)} kVA`} />
         <StatCard label="Total Energy Cost" value={formatCurrency(energy_load_summary.total_energy_cost)} />
         <StatCard label="Load Factor" value={energy_load_summary.load_factor} />
       </div>
@@ -644,7 +640,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="formatted_date" tickFormatter={(val) => val.split(',')[0]} />
               <YAxis />
-              <Tooltip formatter={(value) => formatNumber(value) + " kWh"} />
+              <Tooltip formatter={(value) => formatDecimal(value) + " kWh"} />
               <Bar dataKey="consumption_kwh" fill="#4caf50" name="Energy (kWh)" />
             </BarChart>
           </ResponsiveContainer>
@@ -659,7 +655,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={(value) => formatDecimal(value)} />
               <Legend />
               <Area type="monotone" dataKey="max_range" stackId="1" stroke="none" fill="#ffebee" name="Max Range" />
               <Area type="monotone" dataKey="min_range" stackId="2" stroke="none" fill="#e8f5e9" name="Min Range" />
@@ -668,7 +664,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
             </ComposedChart>
           </ResponsiveContainer>
           <div style={{ textAlign: 'center', fontSize: '0.9rem' }}>
-            Peak Event (Max Range): <strong style={{ color: 'red' }}>{formatNumber(typicalProfile.peak_event.value)} kVA</strong> at {typicalProfile.peak_event.formatted_hour}
+            Peak Event (Max Range): <strong style={{ color: 'red' }}>{formatDecimal(typicalProfile.peak_event.value)} kVA</strong> at {typicalProfile.peak_event.formatted_hour}
           </div>
         </div>
       )}
@@ -681,8 +677,8 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
           </div>
 
           <div className="card-grid">
-            <StatCard label="Daily Total" value={`${formatNumber(day.summary_cards.total_energy_consumption)} kWh`} />
-            <StatCard label="Daily Peak" value={`${formatNumber(day.summary_cards.peak_kva)} kVA`} />
+            <StatCard label="Daily Total" value={`${formatDecimal(day.summary_cards.total_energy_consumption)} kWh`} />
+            <StatCard label="Daily Peak" value={`${formatDecimal(day.summary_cards.peak_kva)} kVA`} />
             <StatCard label="Daily Cost" value={formatCurrency(day.summary_cards.energy_cost)} />
           </div>
 
@@ -691,7 +687,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
               <h4>{day.operating_hours.daytime.label}</h4>
               <div className="op-percent">{day.operating_hours.daytime.percentage}</div>
               <div className="op-details">
-                Consumption: {formatNumber(day.operating_hours.daytime.energy_consumption)} kWh<br />
+                Consumption: {formatDecimal(day.operating_hours.daytime.energy_consumption)} kWh<br />
                 {getOpDetailsString(day.operating_hours.daytime)}
               </div>
             </div>
@@ -699,7 +695,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
               <h4>{day.operating_hours.nighttime.label}</h4>
               <div className="op-percent">{day.operating_hours.nighttime.percentage}</div>
               <div className="op-details">
-                Consumption: {formatNumber(day.operating_hours.nighttime.energy_consumption)} kWh<br />
+                Consumption: {formatDecimal(day.operating_hours.nighttime.energy_consumption)} kWh<br />
                 {getOpDetailsString(day.operating_hours.nighttime)}
               </div>
             </div>
@@ -713,7 +709,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="hour" />
                   <YAxis />
-                  <Tooltip formatter={(value) => formatNumber(value) + " kVA"} />
+                  <Tooltip formatter={(value) => formatDecimal(value) + " kVA"} />
                   <Area type="monotone" dataKey="average_load" stroke="#4caf50" fill="#c8e6c9" name="Load (kVA)" />
                   <ReferenceDot
                     x={day.hourly_load_profile.peak_event.hour}
@@ -723,7 +719,7 @@ function DayReportView({ data, formatNumber, formatDecimal, formatCurrency }) {
                 </AreaChart>
               </ResponsiveContainer>
               <div style={{ textAlign: 'center', fontSize: '0.85rem', marginTop: '10px' }}>
-                Peak Load: <strong style={{ color: 'red' }}>{formatNumber(day.hourly_load_profile.peak_event.value)} kVA</strong> at {day.hourly_load_profile.peak_event.formatted_hour}
+                Peak Load: <strong style={{ color: 'red' }}>{formatDecimal(day.hourly_load_profile.peak_event.value)} kVA</strong> at {day.hourly_load_profile.peak_event.formatted_hour}
               </div>
             </div>
           )}
